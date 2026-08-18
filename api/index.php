@@ -1,34 +1,29 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+use Illuminate\Http\Request;
 
-echo "API INDEX OK<br>";
+define('LARAVEL_START', microtime(true));
+
+$storagePath = '/tmp/storage';
+
+foreach ([
+    'app',
+    'framework/cache',
+    'framework/sessions',
+    'framework/views',
+    'logs',
+] as $directory) {
+    $path = $storagePath . '/' . $directory;
+
+    if (!is_dir($path)) {
+        mkdir($path, 0755, true);
+    }
+}
 
 require __DIR__ . '/../vendor/autoload.php';
 
-echo "AUTOLOAD OK<br>";
-
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-echo "BOOTSTRAP OK<br>";
+$app->useStoragePath($storagePath);
 
-$request = Illuminate\Http\Request::capture();
-
-echo "REQUEST OK<br>";
-
-try {
-    $app->handleRequest($request);
-
-    echo "HANDLE REQUEST OK<br>";
-} catch (\Throwable $e) {
-    echo "<h1>ERRO LARAVEL</h1>";
-    echo "<pre>";
-    echo "Classe: " . get_class($e) . PHP_EOL;
-    echo "Mensagem: " . $e->getMessage() . PHP_EOL;
-    echo "Arquivo: " . $e->getFile() . PHP_EOL;
-    echo "Linha: " . $e->getLine() . PHP_EOL;
-    echo PHP_EOL;
-    echo $e->getTraceAsString();
-    echo "</pre>";
-}
+$app->handleRequest(Request::capture());
