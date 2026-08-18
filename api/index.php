@@ -1,3 +1,3 @@
 <?php
 
-echo 'PHP funcionando no Vercel - ' . PHP_VERSION;
+require __DIR__ . '/../public/index.php';
