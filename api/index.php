@@ -1,7 +1,11 @@
 <?php
 
-header('Content-Type: text/plain');
+use Illuminate\Http\Request;
 
-echo "DEPLOY OK\n";
-echo "PHP: " . PHP_VERSION . "\n";
-echo "TIME: " . date('c') . "\n";
+require __DIR__.'/../vendor/autoload.php';
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->register(\Illuminate\View\ViewServiceProvider::class);
+
+$app->handleRequest(Request::capture());
