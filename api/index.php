@@ -4,12 +4,8 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-echo '<pre>';
+$app->register(\Illuminate\View\ViewServiceProvider::class);
 
-foreach ($app->getLoadedProviders() as $provider => $loaded) {
-    echo $provider . ' => ' . ($loaded ? 'true' : 'false') . PHP_EOL;
-}
-
-echo '</pre>';
+var_dump($app->bound('view'));
 
 exit;
