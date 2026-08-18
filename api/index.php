@@ -1,29 +1,39 @@
 <?php
 
-use Illuminate\Http\Request;
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
-define('LARAVEL_START', microtime(true));
+try {
+    echo "1. START<br>";
 
-$storagePath = '/tmp/storage';
+    require __DIR__ . '/../vendor/autoload.php';
 
-foreach ([
-    'app',
-    'framework/cache',
-    'framework/sessions',
-    'framework/views',
-    'logs',
-] as $directory) {
-    $path = $storagePath . '/' . $directory;
+    echo "2. AUTOLOAD OK<br>";
 
-    if (!is_dir($path)) {
-        mkdir($path, 0755, true);
-    }
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
+
+    echo "3. BOOTSTRAP OK<br>";
+
+    $request = Illuminate\Http\Request::capture();
+
+    echo "4. REQUEST OK<br>";
+
+    $app->handleRequest($request);
+
+    echo "5. HANDLE OK<br>";
+
+} catch (\Throwable $e) {
+
+    http_response_code(500);
+
+    echo "<h1>ERRO</h1>";
+
+    echo "<pre>";
+    echo "Classe: " . get_class($e) . PHP_EOL;
+    echo "Mensagem: " . $e->getMessage() . PHP_EOL;
+    echo "Arquivo: " . $e->getFile() . PHP_EOL;
+    echo "Linha: " . $e->getLine() . PHP_EOL;
+    echo PHP_EOL;
+    echo $e->getTraceAsString();
+    echo "</pre>";
 }
-
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-
-$app->useStoragePath($storagePath);
-
-$app->handleRequest(Request::capture());
