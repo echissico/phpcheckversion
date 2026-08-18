@@ -6,27 +6,53 @@ ini_set('display_errors', '1');
 try {
     echo "1. START<br>";
 
+    // Diretórios graváveis do Vercel
+    $tmp = '/tmp/laravel';
+
+    $directories = [
+        $tmp,
+        $tmp . '/storage',
+        $tmp . '/storage/app',
+        $tmp . '/storage/framework',
+        $tmp . '/storage/framework/cache',
+        $tmp . '/storage/framework/sessions',
+        $tmp . '/storage/framework/views',
+        $tmp . '/storage/logs',
+        $tmp . '/bootstrap/cache',
+    ];
+
+    foreach ($directories as $directory) {
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+    }
+
+    echo "2. TMP OK<br>";
+
     require __DIR__ . '/../vendor/autoload.php';
 
-    echo "2. AUTOLOAD OK<br>";
+    echo "3. AUTOLOAD OK<br>";
 
     $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-    echo "3. BOOTSTRAP OK<br>";
+    echo "4. BOOTSTRAP OK<br>";
+
+    // Storage gravável
+    $app->useStoragePath($tmp . '/storage');
+
+    echo "5. STORAGE OK<br>";
 
     $request = Illuminate\Http\Request::capture();
 
-    echo "4. REQUEST OK<br>";
+    echo "6. REQUEST OK<br>";
 
     $app->handleRequest($request);
-
-    echo "5. HANDLE OK<br>";
 
 } catch (\Throwable $e) {
 
     http_response_code(500);
 
-    echo "<h1>ERRO</h1>";
+    echo "<h1>ERRO LARAVEL</h1>";
 
     echo "<pre>";
     echo "Classe: " . get_class($e) . PHP_EOL;
