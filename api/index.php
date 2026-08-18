@@ -1,11 +1,13 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+define('LARAVEL_START', microtime(true));
 
-$app->register(\Illuminate\View\ViewServiceProvider::class);
+require __DIR__.'/../vendor/autoload.php';
 
-var_dump($app->bound('view'));
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-exit;
+$app->handleRequest(Request::capture());
