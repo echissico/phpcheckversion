@@ -1,21 +1,31 @@
 <?php
 
-header('Content-Type: text/plain');
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
-echo "1. START\n";
+define('LARAVEL_START', microtime(true));
 
-require __DIR__ . '/../vendor/autoload.php';
+$tmp = '/tmp/laravel';
 
-echo "2. AUTOLOAD OK\n";
+foreach ([
+    $tmp,
+    $tmp.'/storage',
+    $tmp.'/storage/app',
+    $tmp.'/storage/framework',
+    $tmp.'/storage/framework/cache',
+    $tmp.'/storage/framework/sessions',
+    $tmp.'/storage/framework/views',
+    $tmp.'/storage/logs',
+] as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+}
 
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+require __DIR__.'/../vendor/autoload.php';
 
-echo "3. BOOTSTRAP OK\n";
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-$app->register(\Illuminate\View\ViewServiceProvider::class);
+$app->useStoragePath($tmp.'/storage');
 
-echo "4. VIEW PROVIDER OK\n";
-
-var_dump($app->bound('view'));
-
-echo "5. END\n";
+$app->handleRequest(Request::capture());
