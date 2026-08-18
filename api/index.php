@@ -1,36 +1,49 @@
 <?php
 
+use Illuminate\Http\Request;
+
 header('Content-Type: text/plain');
 
-echo "1. START\n";
-flush();
+try {
+    echo "1. START\n";
 
-require __DIR__.'/../vendor/autoload.php';
+    require __DIR__.'/../vendor/autoload.php';
 
-echo "2. AUTOLOAD OK\n";
-flush();
+    echo "2. AUTOLOAD OK\n";
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+    $app = require_once __DIR__.'/../bootstrap/app.php';
 
-echo "3. BOOTSTRAP OK\n";
-flush();
+    echo "3. BOOTSTRAP OK\n";
 
-$app->register(\Illuminate\View\ViewServiceProvider::class);
+    $app->register(\Illuminate\View\ViewServiceProvider::class);
 
-echo "4. VIEW PROVIDER OK\n";
-flush();
+    echo "4. VIEW PROVIDER OK\n";
 
-var_dump($app->bound('view'));
+    $request = Request::capture();
 
-echo "5. VIEW BOUND OK\n";
-flush();
+    echo "5. REQUEST OK\n";
 
-$request = \Illuminate\Http\Request::capture();
+    $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
-echo "6. REQUEST OK\n";
-flush();
+    echo "6. KERNEL OK\n";
 
-$response = $app->handleRequest($request);
+    $response = $kernel->handle($request);
 
-echo "7. RESPONSE OK\n";
-flush();
+    echo "7. HANDLE OK\n";
+
+    echo "STATUS: ".$response->getStatusCode()."\n";
+
+    echo "BODY:\n";
+    echo $response->getContent();
+
+    $kernel->terminate($request, $response);
+
+} catch (\Throwable $e) {
+
+    echo "\n\n=== EXCEPTION ===\n";
+    echo "CLASS: ".get_class($e)."\n";
+    echo "MESSAGE: ".$e->getMessage()."\n";
+    echo "FILE: ".$e->getFile()."\n";
+    echo "LINE: ".$e->getLine()."\n\n";
+    echo $e->getTraceAsString();
+}
